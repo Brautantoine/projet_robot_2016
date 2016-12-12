@@ -1,7 +1,5 @@
 #include "nboard.h"
 
-#define correction 0.02
-
 unsigned char state(1);
 unsigned char core(1);
 float speed(1);
@@ -21,7 +19,7 @@ float lire_capteur(int n_capteur)
 void tout_droit()
 {
     BusMux=7;
-    RWM1.write(AnaIn.read()-float(correction)*float(AnaIn.read()));
+    RWM1.write(AnaIn.read());
     RWM2.write(AnaIn.read());
     if((lire_capteur(1)<float(0.45)&&lire_capteur(2)>float(0.45)))state=GAUCHE;
     if((lire_capteur(1)>float(0.45)&&lire_capteur(2)<float(0.45)))state=DROITE;
@@ -33,8 +31,8 @@ void tout_droit()
 void babord_capitaine()
 {
     BusMux=7;
-    RWM1.write(AnaIn.read()-float(correction)*float(AnaIn.read()));
-    RWM2.write(float(0.43)*float(AnaIn.read()));
+    RWM1.write(AnaIn.read());
+    RWM2.write(float(0.45)*float(AnaIn.read()));
     if((lire_capteur(1)>float(0.45)&&lire_capteur(2)>float(0.45)))state=TOUT_DROIT;
     if(!BPP)state=STOP;
 }
@@ -42,7 +40,7 @@ void babord_capitaine()
 void tribord_capitaine()
 {
     BusMux=7;
-    RWM1.write(float(0.43)*float(AnaIn.read())-float(correction)*float(AnaIn.read()));
+    RWM1.write(float(0.45)*float(AnaIn.read()));
     RWM2.write(AnaIn.read());
     if((lire_capteur(1)>float(0.45)&&lire_capteur(2)>float(0.45)))state=TOUT_DROIT;
     if(!BPP)state=STOP;
@@ -54,7 +52,8 @@ int main()
     RWM1.period(0.00005);
     RWM2.period(0.00005);
     
-    
+    while(1)
+    {
      while(jack) {
                 BusMux=7;
                 ihm.LCD_gotoxy(0,0);
@@ -90,7 +89,6 @@ int main()
                 core=0;
          }       
     }
-    while(1)
-    {
+    while(1);
     }
 }
