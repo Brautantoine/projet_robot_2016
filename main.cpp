@@ -162,7 +162,7 @@ void nouvel_etat_pre_suivie() //automate de pre suivie
         case POL:
                 /*execute un polygones puis attend un appui sur le bp3*/
         ihm.LCD_gotoxy(0,0);
-        ihm.LCD_printf("test moteur");
+        ihm.LCD_printf("polygone");
         PWMG.write(0.4);
         PWMD.write(0.4);
         wait(1);
