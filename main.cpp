@@ -24,17 +24,19 @@ void nouvel_etat_pre_suivie();
 int main() 
 {
     BusMux=7;
-		/*initialisation des moteur*/
+        /*initialisation des moteur*/
     PWMD.period(0.00005);
     PWMG.period(0.00005);
     
     /* affichage de bienvenue*/
-		ihm.LCD_gotoxy(0,0);
-		ihm.LCD_printf("Gr A6 equpie BCDL");
-		wait(1);
-		
+        ihm.LCD_gotoxy(0,0);
+        ihm.LCD_printf("Gr A6");
+        ihm.LCD_gotoxy(1,0);
+        ihm.LCD_printf("equipe BCDL");
+        wait(1);
+        
      while(jack) {
-						nouvel_etat_pre_suivie();
+                        nouvel_etat_pre_suivie();
             }
             BusMux=7;
     while(core) 
@@ -57,8 +59,8 @@ int main()
                 A_Droite();
                 break;
             case STOP:
-							Stop_Robot();
-							break;
+                            Stop_Robot();
+                            break;
          }       
     }
     while(1)
@@ -104,79 +106,91 @@ void A_Droite() //procedure d actualisations du moteur (1:0.4)
 
 void Stop_Robot() //procedure d actualisations du moteur (0:0)
 {
-	PWMD.write(0);
+    PWMD.write(0);
   PWMG.write(0);
   core=0; //sortie de boucle while
 }
 void nouvel_etat_pre_suivie() //automate de pre suivie
 {
-	int val(0);
-	int val_2(0);
-	switch (state_P)
-	{
-		case WAIT:
-			/*affichage des capteur et du vpot en tps réel*/
-			BusMux=7;
+    
+    switch (state_P)
+    {
+        case WAIT:
+            /*affichage des capteur et du vpot en tps réel*/
+            BusMux=7;
       ihm.LCD_gotoxy(0,0);
-      ihm.LCD_printf("pot=%f",AnaIn.read());
+      ihm.LCD_printf("pot=%f w",AnaIn.read());
+      ihm.LCD_gotoxy(1,0);
+        ihm.LCD_printf("equipe BCDL");
       BusLed=0X00;
       for(i=0; i<6; i++) {
-				if(lire_capteur(i)>float(0.5))BusLed[i]=1;
+                if(lire_capteur(i)>float(0.5))BusLed[i]=1;
       }
-			if(!BP0)state_P=CAPT;
-			else if(!BP1)state_P=MOT;
-			else if(!BP2)state_P=POL;
-			break;
-		case CAPT:
-			/*comme wait mais avec un calibrage possible*/
-			BusMux=7;
+            if(!BP0)state_P=CAPT;
+            else if(!BP1)state_P=MOT;
+            else if(!BP2)state_P=POL;
+            break;
+        case CAPT:
+            /*comme wait mais avec un calibrage possible*/
+            BusMux=7;
       ihm.LCD_gotoxy(0,0);
       ihm.LCD_printf("pot=%f att calibrage",AnaIn.read());
-		  if(!BP0)seuil=AnaIn.read();
+          if(!BP0)seuil=AnaIn.read();
       BusLed=0X00;
       for(i=0; i<6; i++) {
-				if(lire_capteur(i)>float(seuil))BusLed[i]=1;
+                if(lire_capteur(i)>float(seuil))BusLed[i]=1;
       }
-			if(!BPP)state_P=WAIT;
-			break;
-		case MOT:
-			BusMux = 7;
-           
-        // la fonction AnaIn.read lit le potention mettre, la variable val prend la valeur du potentiometre 
-        val=AnaIn.read();
-           
-        // affichage de la valeur du potentiometre
+            if(!BPP)state_P=WAIT;
+            break;
+        case MOT:
+            ihm.LCD_gotoxy(0,0);
+            ihm.LCD_printf("test moteur");
+            PWMD.write(0.5);
+            PWMG.write(0.5);
+            wait(0.5);
+            PWMD.write(0);
+            PWMG.write(0.5);
+            wait(0.5);
+            PWMD.write(0.5);
+            PWMG.write(0);
+            wait(0.5);
+            PWMD.write(0);
+            PWMG.write(0);
+            while(BPP);
+            state_P=WAIT;
+            break;
+        case POL:
+                /*execute un polygones puis attend un appui sur le bp3*/
         ihm.LCD_gotoxy(0,0);
-        ihm.LCD_printf("Vitesse_d=%f",val);
-        
-        // la variable val_2 prend la valeur (1-valeur_potentiometre)    
-        val_2=1-AnaIn.read();
-        
-        // affichage de la valeur du potentiometre    
-        ihm.LCD_gotoxy(1,0);
-        ihm.LCD_printf("Vitesse_g=%f",val_2);
-       
-          if(BP0==0)
-           {
-            // PWM0 prend la valeur de la variable val
-            PWMD.write(val);                       
-            
-            // PWM1 prend la valeur de la variable val_2
-            PWMG.write(val_2);
-           }
-					 wait(0.5);
-					 if(!BPP)state_P=WAIT;
-			break;
-		case POL:
-				/*execute un polygones puis attend un appui sur le bp3*/
-				PWMG.write(0.2);
-        PWMD.write(0.2);
-        wait(2.5);
-        PWMG.write(0.3);
+        ihm.LCD_printf("test moteur");
+        PWMG.write(0.4);
+        PWMD.write(0.4);
+        wait(1);
+        PWMG.write(0.5);
         PWMD.write(0);
-        wait(0.9);
-				while(BPP);
-				state_P=WAIT;
-			break;
-	}
+        wait(0.5);
+        PWMG.write(0.4);
+        PWMD.write(0.4);
+        wait(1);
+        PWMG.write(0.5);
+        PWMD.write(0);
+        wait(0.5);
+        PWMG.write(0.4);
+        PWMD.write(0.4);
+        wait(1);
+        PWMG.write(0.5);
+        PWMD.write(0);
+        wait(0.5);
+        PWMG.write(0.4);
+        PWMD.write(0.4);
+        wait(1);
+        PWMG.write(0.5);
+        PWMD.write(0);
+        wait(0.5);
+        PWMG.write(0);
+        PWMD.write(0);
+                while(BPP);
+                state_P=WAIT;
+            break;
+    }
 }
