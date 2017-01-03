@@ -34,11 +34,14 @@ int main()
         ihm.LCD_gotoxy(1,0);
         ihm.LCD_printf("equipe BCDL");
         wait(1);
-        
+    
+     /*automate de pre suivie*/
      while(jack) {
                         nouvel_etat_pre_suivie();
             }
             BusMux=7;
+                        
+        /*automate de suivie*/              
     while(core) 
     {
         BusLed=0X00;
@@ -59,8 +62,8 @@ int main()
                 A_Droite();
                 break;
             case STOP:
-                            Stop_Robot();
-                            break;
+                Stop_Robot();
+                break;
          }       
     }
     while(1)
@@ -135,7 +138,7 @@ void nouvel_etat_pre_suivie() //automate de pre suivie
             BusMux=7;
       ihm.LCD_gotoxy(0,0);
       ihm.LCD_printf("pot=%f att calibrage",AnaIn.read());
-          if(!BP0)seuil=AnaIn.read();
+      if(!BP0)seuil=AnaIn.read();
       BusLed=0X00;
       for(i=0; i<6; i++) {
                 if(lire_capteur(i)>float(seuil))BusLed[i]=1;
@@ -156,7 +159,7 @@ void nouvel_etat_pre_suivie() //automate de pre suivie
             wait(0.5);
             PWMD.write(0);
             PWMG.write(0);
-            while(BPP);
+            while(BPP&&jack);
             state_P=WAIT;
             break;
         case POL:
@@ -189,8 +192,8 @@ void nouvel_etat_pre_suivie() //automate de pre suivie
         wait(0.5);
         PWMG.write(0);
         PWMD.write(0);
-                while(BPP);
-                state_P=WAIT;
+        while(BPP&&jack);
+        state_P=WAIT;
             break;
     }
 }
